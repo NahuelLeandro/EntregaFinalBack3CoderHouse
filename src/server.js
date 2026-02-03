@@ -3,6 +3,7 @@ import http from "http";
 import dotenv from "dotenv";
 import connectMongo from "./config/mongoConfig.js";
 import indexRoutes from "./routes/indexRoutes.js";
+import errorHandler from "./middlewares/errorHandler.js";
 
 dotenv.config();
 
@@ -29,13 +30,7 @@ app.use("/", indexRoutes);
 
 
 
-/*
-// 404 Handler
-app.use((req, res) => {
-    console.log("❌ Ruta no encontrada:", req.method, req.url);
-    res.status(404).send("Ruta no encontrada");
-});
-*/
+app.use(errorHandler);
 
 
 

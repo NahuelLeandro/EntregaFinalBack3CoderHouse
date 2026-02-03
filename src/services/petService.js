@@ -1,21 +1,34 @@
 import petDAO from "../dao/petDao.js";
+import CustomError from "../utils/CustomError.js";
 
 class PetService {
     async getAllPets() {
-        return await petDAO.getAll();
+        //return await petDAO.getAll();
+        const pets = await petDAO.getAll();
+
+        if (!pets.length) {
+            throw new CustomError("No hay mascotas cargadas", 404);
+        }
+
+        return pets;
     }
 
     async getPetById(id) {
+
         const pet = await petDAO.getById(id);
-        if (!pet) throw new Error("Mascota no encontrada");
+        
+        if (!pet) {
+            throw new CustomError("Mascota no encontrada", 404);
+        }
+        
         return pet;
     }
 
     async createPet(data) {
         const { name, species, age } = data;
 
-        if (!name || !species) {
-            throw new Error("Campos obligatorios faltantes");
+        if (!name || !species || !age) {
+            throw new CustomError("Campos obligatorios faltantes", 400);
         }
 
         return await petDAO.create(data);
@@ -23,13 +36,20 @@ class PetService {
 
     async updatePet(id, data) {
         const updated = await petDAO.updateById(id, data);
-        if (!updated) throw new Error("Mascota no encontrada o no actualizada");
+        if (!updated) {
+            throw new CustomError("Mascota no encontrada", 404);//aca tengo una duda. usuario no encontrado seria un 404 Recurso no existe, pero no actualizado no seria un 409 Conflicto? no se como diferenciarlo, si tengo que hacerlo o si vale la pena.
+        }
         return updated;
     }
 
     async deletePet(id) {
+
         const deleted = await petDAO.deleteById(id);
-        if (!deleted) throw new Error("Mascota no encontrada");
+    
+        if (!deleted) {
+            throw new CustomError("Mascota no encontrada", 404);
+        }
+
         return deleted;
     }
 }

@@ -81,19 +81,46 @@ import petDAO from "../dao/petDao.js";
 
 const router = express.Router();
 
-/* GET /api/mocks/mockingusers */
+
+/* GET /api/mocks/mockingusers 
+genera una cantidad fija, no la guarda en BD*/
 router.get("/mockingusers", (req, res) => {
     const users = generateMockUsers(50);
     res.status(200).json(users);
 });
 
-/* GET /api/mocks/mockingpets */
+/* GET /api/mocks/mockingusers/43
+genera la cantidad que le pidasdesde el endpoint o url por params, no la guarda en BD*/
+router.get("/mockingusers/:qty", (req, res) => {
+    const qty = Number(req.params.qty) || 50;
+    const users = generateMockUsers(qty);
+    res.status(200).json(users);
+});
+
+/* GET /api/mocks/mockingpets 
+genera una cantidad fija, no la guarda en BD*/
 router.get("/mockingpets", (req, res) => {
     const pets = generateMockPets(50);
     res.status(200).json(pets);
 });
+/* GET /api/mocks/mockingpets 
+genera la cantidad que le pidasdesde el endpoint o url por params, no la guarda en BD*/
+router.get("/mockingpets/:qty", (req, res) => {
+    const qty = Number(req.params.qty) || 50;
+    const pets = generateMockPets(qty);
+    res.status(200).json(pets);
+});
 
-/* POST /api/mocks/generateData */
+
+/* POST /api/mocks/generateData  
+genera data en postman con 
+Body → raw → JSON
+{
+    "users": 10,
+    "pets": 5
+} 
+guarda en la BD
+*/
 router.post("/generateData", async (req, res) => {
     try {
         const { users = 0, pets = 0 } = req.body;
@@ -117,5 +144,39 @@ router.post("/generateData", async (req, res) => {
         });
     }
 });
+
+/* POST /api/mocks/generateData/10/20 
+genera data en postman con 
+desde el endpoint o url por params, no por body
+guarda en la BD
+*/
+
+router.post("/generateData/:users/:pets", async (req, res) => {
+    try {
+        const usersQty = Number(req.params.users);
+        const petsQty = Number(req.params.pets);
+
+        const mockUsers = generateMockUsers(usersQty);
+        const mockPets = generateMockPets(petsQty);
+
+        await userDAO.insertMany(mockUsers);
+        await petDAO.insertMany(mockPets);
+
+        res.status(201).json({
+            status: "success",
+            insertedUsers: mockUsers.length,
+            insertedPets: mockPets.length
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            status: "error",
+            message: "Error generating data"
+        });
+    }
+});
+
+
 
 export default router;

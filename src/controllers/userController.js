@@ -1,48 +1,48 @@
 import userService from "../services/userService.js";
 
 class UserController {
-    async getAllUsers(req, res) {
+    async getAllUsers(req, res, next) {
         try {
             const users = await userService.getAllUsers();
             res.json({ status: "success", payload: users });
         } catch (error) {
-            res.status(500).json({ status: "error", message: error.message });
+            next(error);
         }
     }
 
-    async getUserById(req, res) {
+    async getUserById(req, res, next) {
         try {
             const user = await userService.getUserById(req.params.uid);
             res.json({ status: "success", payload: user });
         } catch (error) {
-            res.status(404).json({ status: "error", message: error.message });
+            next(error);
         }
     }
 
-    async createUser(req, res) {
+    async createUser(req, res, next) {
         try {
             const created = await userService.createUser(req.body);
             res.status(201).json({ status: "success", payload: created });
         } catch (error) {
-            res.status(400).json({ status: "error", message: error.message });
+            next(error);
         }
     }
 
-    async updateUserById(req, res) {
+    async updateUserById(req, res, next) {
         try {
             const updated = await userService.updateUser(req.params.uid, req.body);
             res.json({ status: "success", payload: updated });
         } catch (error) {
-            res.status(400).json({ status: "error", message: error.message });
+            next(error);
         }
     }
 
-    async deleteUserById(req, res) {
+    async deleteUserById(req, res, next) {
         try {
             const deleted = await userService.deleteUser(req.params.uid);
             res.json({ status: "success", payload: deleted });
         } catch (error) {
-            res.status(400).json({ status: "error", message: error.message });
+            next(error);
         }
     }
 }
