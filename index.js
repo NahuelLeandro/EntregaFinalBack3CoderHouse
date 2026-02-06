@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import { app, server } from "./src/server.js";
+import { app, server, logger } from "./src/server.js";
 import cluster from 'cluster'//nuevo
 import {cpus} from 'os'//nuevo
 dotenv.config({ quiet: true });
@@ -13,6 +13,11 @@ if (!process.env.PORT) {
 const PORT = process.env.PORT;
 
 
+// if (cluster.isPrimary) {
+//   console.clear();
+// }
+
+
 if (cluster.isPrimary) {
   console.log(`Primary process ${process.pid}`);
   console.log(`CPUs: ${cpus().length}`);
@@ -23,7 +28,7 @@ if (cluster.isPrimary) {
 
 } else {
   server.listen(PORT, () => {
-    console.log(`✅ Servidor corriendo en http://localhost:${PORT} process: ${process.pid}`);
+    logger.info(`✅ Servidor corriendo en http://localhost:${PORT} process: ${process.pid}`);
   });
 }
 

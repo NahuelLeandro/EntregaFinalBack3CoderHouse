@@ -5,8 +5,9 @@ import connectMongo from "./config/mongoConfig.js";
 import indexRoutes from "./routes/indexRoutes.js";
 import errorHandler from "./middlewares/errorHandler.js";
 import compression from "express-compression";
+import winston from "winston";
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 // Inicialización
 const app = express();
@@ -37,6 +38,24 @@ app.use(compression({
     },
 }));
 
+//winston
+/*
+Niveles:
+error: 0
+warn: 1
+info: 2
+http:3
+verbose:4
+debug:5
+*/
+const logger = winston.createLogger({
+    transports:[
+        new winston.transports.Console({level:"http"})
+    ]
+})
+
+
+
 
 // Rutas principales
 app.use("/", indexRoutes);
@@ -48,4 +67,4 @@ app.use(errorHandler);
 
 
 
-export { app, server };
+export { app, server , logger };
